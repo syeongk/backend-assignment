@@ -19,6 +19,11 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 public class Payment extends BaseEntity {
+    // 결제 방법
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
+    private PaymentMethod paymentMethod;
+
     // 최종 결제금액
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
