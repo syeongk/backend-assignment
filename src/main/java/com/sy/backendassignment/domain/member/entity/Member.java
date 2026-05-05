@@ -1,6 +1,8 @@
-package com.sy.backendassignment.domain.member;
+package com.sy.backendassignment.domain.member.entity;
 
 import com.sy.backendassignment.domain.common.BaseEntity;
+import com.sy.backendassignment.domain.order.entity.Order;
+import com.sy.backendassignment.domain.order.entity.Payment;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,5 +32,11 @@ public class Member extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grade_id", nullable = false)
     private Grade grade;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.PERSIST)
+    private List<Order> orders = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.PERSIST)
+    private List<Payment> payments = new ArrayList<>();
 }
 

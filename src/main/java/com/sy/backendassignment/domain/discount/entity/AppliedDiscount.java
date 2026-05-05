@@ -1,8 +1,10 @@
-package com.sy.backendassignment.domain.discount;
+package com.sy.backendassignment.domain.discount.entity;
 
 import com.sy.backendassignment.domain.common.BaseEntity;
+import com.sy.backendassignment.domain.discount.DiscountType;
+import com.sy.backendassignment.domain.discount.DiscountUnit;
 import com.sy.backendassignment.domain.member.GradeType;
-import com.sy.backendassignment.domain.order.Payment;
+import com.sy.backendassignment.domain.order.entity.Payment;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

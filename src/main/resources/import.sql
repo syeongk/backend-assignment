@@ -16,7 +16,7 @@ INSERT INTO member (name, point, grade_id, created_at, updated_at, is_deleted) V
 INSERT INTO member (name, point, grade_id, created_at, updated_at, is_deleted) VALUES ('이소영', 1000000.00, (SELECT id FROM grade WHERE grade_type = 'VVIP'), NOW(), NOW(), false);
 
 -- 아이템 데이터 --
-INSERT INTO item (name, price, created_at, updated_at, is_deleted) VALUES ('무선 이어폰', 369000.00, NOW(), NOW(), false);
-INSERT INTO item (name, price, created_at, updated_at, is_deleted) VALUES ('썰은 배추김치', 14900.00, NOW(), NOW(), false);
-INSERT INTO item (name, price, created_at, updated_at, is_deleted) VALUES ('바하 클렌징폼', 6020.00, NOW(), NOW(), false);
-INSERT INTO item (name, price, created_at, updated_at, is_deleted) VALUES ('팽이버섯', 830.00, NOW(), NOW(), false);
+INSERT INTO item (name, price, created_at, updated_at, is_deleted) VALUES ('고급 강의', 581293.00, NOW(), NOW(), false);
+INSERT INTO item (name, price, created_at, updated_at, is_deleted) VALUES ('중급 강의', 14900.00, NOW(), NOW(), false);
+INSERT INTO item (name, price, created_at, updated_at, is_deleted) VALUES ('일반 강의', 5999.00, NOW(), NOW(), false);
+INSERT INTO item (name, price, created_at, updated_at, is_deleted) VALUES ('맛보기 강의', 800.00, NOW(), NOW(), false);

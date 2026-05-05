@@ -1,7 +1,9 @@
-package com.sy.backendassignment.domain.discount;
+package com.sy.backendassignment.domain.discount.entity;
 
 import com.sy.backendassignment.domain.common.BaseEntity;
-import com.sy.backendassignment.domain.member.Grade;
+import com.sy.backendassignment.domain.discount.DiscountType;
+import com.sy.backendassignment.domain.discount.DiscountUnit;
+import com.sy.backendassignment.domain.member.entity.Grade;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,9 +12,12 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.sy.backendassignment.domain.discount.DiscountUnit.WON;
 
 @Entity
 @Getter
@@ -56,4 +61,13 @@ public class DiscountPolicy extends BaseEntity {
     // 적용된 할인 목록
     @OneToMany(mappedBy = "discountPolicy", cascade = CascadeType.PERSIST)
     private List<AppliedDiscount> appliedDiscounts = new ArrayList<>();
+
+    // 할인 금액 계산
+    public BigDecimal calculateDiscountAmount(BigDecimal price) {
+        if (this.discountUnit.equals(WON)) {
+            return this.discountValue;
+        } else {
+            return price.multiply(this.discountValue).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
+        }
+    }
 }
