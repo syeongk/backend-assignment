@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -38,12 +36,6 @@ public class OrderItem extends BaseEntity {
                 .orderItemPrice(item.getPrice())
                 .item(item)
                 .build();
-    }
-
-    public static List<OrderItem> createOrderItems(List<Item> items) {
-        return items.stream()
-                .map(OrderItem::createOrderItem)
-                .collect(Collectors.toList());
     }
 
     protected void setOrder(Order order) {

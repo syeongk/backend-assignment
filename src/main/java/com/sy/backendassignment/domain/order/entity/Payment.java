@@ -13,10 +13,11 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.sy.backendassignment.domain.order.PaymentStatus.COMPLETED;
+import static com.sy.backendassignment.domain.order.PaymentStatus.*;
 
 @Entity
 @Getter
@@ -38,11 +39,15 @@ public class Payment extends BaseEntity {
     @Column(nullable = false, length = 20)
     private PaymentStatus paymentStatus;
 
+    // 결제 일시
+    private LocalDateTime paidAt;
+
     // 주문 엔티티
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
+    // 회원 엔티티
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -55,9 +60,18 @@ public class Payment extends BaseEntity {
         return Payment.builder()
                 .paymentMethod(method)
                 .amount(amount)
-                .paymentStatus(COMPLETED)
+                .paymentStatus(READY)
                 .order(order)
                 .member(member)
                 .build();
+    }
+
+    public void complete() {
+        this.paymentStatus = COMPLETED;
+        this.paidAt = LocalDateTime.now();
+    }
+
+    public void fail() {
+        this.paymentStatus = FAILED;
     }
 }
