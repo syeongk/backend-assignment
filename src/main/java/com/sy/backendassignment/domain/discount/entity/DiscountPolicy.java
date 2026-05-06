@@ -5,10 +5,7 @@ import com.sy.backendassignment.domain.discount.DiscountType;
 import com.sy.backendassignment.domain.discount.DiscountUnit;
 import com.sy.backendassignment.domain.member.entity.Grade;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
@@ -55,10 +52,12 @@ public class DiscountPolicy extends BaseEntity {
     private LocalDateTime endAt;
 
     // 등급 목록
+    @Builder.Default
     @OneToMany(mappedBy = "discountPolicy", cascade = CascadeType.PERSIST)
     private List<Grade> grades = new ArrayList<>();
 
     // 적용된 할인 목록
+    @Builder.Default
     @OneToMany(mappedBy = "discountPolicy", cascade = CascadeType.PERSIST)
     private List<AppliedDiscount> appliedDiscounts = new ArrayList<>();
 

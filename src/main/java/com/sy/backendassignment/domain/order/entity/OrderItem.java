@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 public class OrderItem extends BaseEntity {
     // 주문 시점 가격
     @Column(nullable = false, precision = 15, scale = 2)
-    private BigDecimal orderItemPrice;
+    private BigDecimal price;
 
     // 주문 엔티티
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,7 +33,7 @@ public class OrderItem extends BaseEntity {
     // 초기 주문 아이템 객체 생성
     public static OrderItem createOrderItem(Item item) {
         return OrderItem.builder()
-                .orderItemPrice(item.getPrice())
+                .price(item.getPrice())
                 .item(item)
                 .build();
     }

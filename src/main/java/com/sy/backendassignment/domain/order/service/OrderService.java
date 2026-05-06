@@ -25,16 +25,18 @@ public class OrderService {
         // Item 을 OrderItem 으로 변환
         OrderItem orderItem = OrderItem.createOrderItem(item);
 
+        BigDecimal paymentAmount = calculatePaymentAmount(member, orderItem, paymentMethod);
+
         // Order 객체 생성
-        Order order = Order.createOrder(member, orderItem, paymentMethod);
+        Order order = Order.createOrder(member, orderItem, paymentAmount);
 
         // Order 객체 저장
         return orderRepository.save(order);
     }
 
     // 회원 등급에 따라 할인 정책 적용된 결제 금액 계산
-    public BigDecimal calculatePaymentAmount(Member member, Order order, PaymentMethod paymentMethod) {
-        BigDecimal orderCost = order.getCost();
+    public BigDecimal calculatePaymentAmount(Member member, OrderItem orderItem, PaymentMethod paymentMethod) {
+        BigDecimal orderCost = orderItem.getPrice();
         Grade grade = member.getGrade();
 
         // 상품 할인 금액 계산

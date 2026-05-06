@@ -4,10 +4,7 @@ import com.sy.backendassignment.domain.common.BaseEntity;
 import com.sy.backendassignment.domain.discount.entity.DiscountPolicy;
 import com.sy.backendassignment.domain.member.GradeType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
@@ -31,6 +28,7 @@ public class Grade extends BaseEntity {
     private DiscountPolicy discountPolicy;
 
     // 회원 목록
+    @Builder.Default
     @OneToMany(mappedBy = "grade", cascade = CascadeType.PERSIST)
     private List<Member> members = new ArrayList<>();
 

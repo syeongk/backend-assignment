@@ -6,10 +6,7 @@ import com.sy.backendassignment.domain.member.entity.Member;
 import com.sy.backendassignment.domain.order.PaymentMethod;
 import com.sy.backendassignment.domain.order.PaymentStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
@@ -53,6 +50,7 @@ public class Payment extends BaseEntity {
     private Member member;
 
     // 적용된 할인 목록
+    @Builder.Default
     @OneToMany(mappedBy = "payment", cascade = CascadeType.PERSIST)
     private List<AppliedDiscount> appliedDiscounts = new ArrayList<>();
 

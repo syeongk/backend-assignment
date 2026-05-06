@@ -10,8 +10,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-
 import static com.sy.backendassignment.domain.order.entity.Payment.createPayment;
 
 @Service
@@ -23,10 +21,8 @@ public class PaymentService {
 
     @Transactional
     public void pay(Member member, Order order, PaymentMethod paymentMethod, Boolean isSuccess) {
-        BigDecimal paymentAmount = orderService.calculatePaymentAmount(member, order, paymentMethod);
-
         // 결제 객체 생성
-        Payment payment = createPayment(member, order, paymentAmount, paymentMethod);
+        Payment payment = createPayment(member, order, order.getPaymentAmount(), paymentMethod);
         paymentRepository.save(payment);
 
         // 결제 시도

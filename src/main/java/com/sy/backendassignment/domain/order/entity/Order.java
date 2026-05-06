@@ -2,12 +2,8 @@ package com.sy.backendassignment.domain.order.entity;
 
 import com.sy.backendassignment.domain.common.BaseEntity;
 import com.sy.backendassignment.domain.member.entity.Member;
-import com.sy.backendassignment.domain.order.PaymentMethod;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
@@ -25,7 +21,12 @@ public class Order extends BaseEntity {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal cost;
 
+    // 결제금액
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal paymentAmount;
+
     // 주문한 상품 목록
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
@@ -39,10 +40,11 @@ public class Order extends BaseEntity {
     private Payment payment;
 
     // 주문 객체 생성
-    public static Order createOrder(Member member, OrderItem orderItem, PaymentMethod method) {
+    public static Order createOrder(Member member, OrderItem orderItem, BigDecimal paymentAmount) {
         Order order = Order.builder()
-                .cost(orderItem.getOrderItemPrice())
+                .cost(orderItem.getPrice())
                 .member(member)
+                .paymentAmount(paymentAmount)
                 .build();
         order.addOrderItem(orderItem);
 
