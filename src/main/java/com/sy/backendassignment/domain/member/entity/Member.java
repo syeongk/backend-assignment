@@ -1,6 +1,8 @@
 package com.sy.backendassignment.domain.member.entity;
 
 import com.sy.backendassignment.domain.common.BaseEntity;
+import com.sy.backendassignment.domain.discount.entity.DiscountPolicy;
+import com.sy.backendassignment.domain.member.GradeType;
 import com.sy.backendassignment.domain.order.entity.Order;
 import com.sy.backendassignment.domain.order.entity.Payment;
 import jakarta.persistence.*;
@@ -10,6 +12,8 @@ import lombok.experimental.SuperBuilder;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.sy.backendassignment.domain.member.GradeType.NORMAL;
 
 @Entity
 @Getter
@@ -37,5 +41,15 @@ public class Member extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.PERSIST)
     private List<Payment> payments = new ArrayList<>();
+
+    public GradeType getGradeType() {
+        if (this.grade == null) return NORMAL;
+        return this.grade.getGradeType();
+    }
+
+    public DiscountPolicy getDiscountPolicy() {
+        if (this.grade == null) return null;
+        return this.grade.getDiscountPolicy();
+    }
 }
 

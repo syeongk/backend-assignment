@@ -1,8 +1,8 @@
 package com.sy.backendassignment.domain.order.service;
 
-import com.sy.backendassignment.domain.member.entity.Grade;
+import com.sy.backendassignment.domain.discount.entity.AppliedDiscount;
 import com.sy.backendassignment.domain.member.entity.Member;
-import com.sy.backendassignment.domain.order.PaymentMethod;
+import com.sy.backendassignment.domain.order.GradeDiscountHandler;
 import com.sy.backendassignment.domain.order.entity.Item;
 import com.sy.backendassignment.domain.order.entity.Order;
 import com.sy.backendassignment.domain.order.entity.OrderItem;
@@ -12,42 +12,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final GradeDiscountHandler gradeDiscountHandler;
 
     // 주문서 생성
     @Transactional
-    public Order createOrder(Member member, Item item, PaymentMethod paymentMethod) {
+    public Order createOrder(Member member, Item item) {
         // Item 을 OrderItem 으로 변환
         OrderItem orderItem = OrderItem.createOrderItem(item);
+        BigDecimal orderItemPrice = orderItem.getPrice();
 
-        BigDecimal paymentAmount = calculatePaymentAmount(member, orderItem, paymentMethod);
+        // 등급에 따른 할인 정책 우선 적용
+        AppliedDiscount appliedDiscount = gradeDiscountHandler.applyDiscount(member, orderItemPrice);
 
         // Order 객체 생성
-        Order order = Order.createOrder(member, orderItem, paymentAmount);
+        Order order = Order.createOrder(member, orderItem, appliedDiscount);
 
         // Order 객체 저장
         return orderRepository.save(order);
-    }
-
-    // 회원 등급에 따라 할인 정책 적용된 결제 금액 계산
-    public BigDecimal calculatePaymentAmount(Member member, OrderItem orderItem, PaymentMethod paymentMethod) {
-        BigDecimal orderCost = orderItem.getPrice();
-        Grade grade = member.getGrade();
-
-        // 상품 할인 금액 계산
-        BigDecimal discountAmount = grade.calculateDiscountAmount(orderCost);
-
-        // 결제 금액 계산
-        BigDecimal paymentAmount = orderCost.subtract(discountAmount);
-
-        // 결제 금액 마이너스 방지
-        paymentAmount = paymentAmount.max(BigDecimal.ZERO);
-
-        return paymentAmount.setScale(0, RoundingMode.HALF_UP);
     }
 }

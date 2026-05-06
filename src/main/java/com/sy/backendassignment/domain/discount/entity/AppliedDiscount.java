@@ -4,12 +4,10 @@ import com.sy.backendassignment.domain.common.BaseEntity;
 import com.sy.backendassignment.domain.discount.DiscountType;
 import com.sy.backendassignment.domain.discount.DiscountUnit;
 import com.sy.backendassignment.domain.member.GradeType;
-import com.sy.backendassignment.domain.order.entity.Payment;
+import com.sy.backendassignment.domain.member.entity.Member;
+import com.sy.backendassignment.domain.order.entity.Order;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
@@ -44,15 +42,28 @@ public class AppliedDiscount extends BaseEntity {
 
     // 할인총액
     @Column(nullable = false, precision = 15, scale = 2)
-    private BigDecimal amount;
+    private BigDecimal discountAmount;
 
-    // 결제 엔티티
+    // 주문 엔티티
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id", nullable = false)
-    private Payment payment;
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
-    // 할인 엔티티
+    // 할인 정책 엔티티
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "discount_policy_id", nullable = false)
     private DiscountPolicy discountPolicy;
+
+    public static AppliedDiscount createAppliedDiscount(Member member, DiscountPolicy discountPolicy, BigDecimal discountAmount) {
+        return AppliedDiscount.builder()
+                .gradeType(member.getGradeType())
+                .name(discountPolicy.getName())
+                .discountValue(discountPolicy.getDiscountValue())
+                .discountUnit(discountPolicy.getDiscountUnit())
+                .discountType(discountPolicy.getDiscountType())
+                .discountAmount(discountAmount)
+                .discountPolicy(discountPolicy)
+                .build();
+    }
 }

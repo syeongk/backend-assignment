@@ -1,12 +1,14 @@
 package com.sy.backendassignment.domain.order.entity;
 
 import com.sy.backendassignment.domain.common.BaseEntity;
+import com.sy.backendassignment.domain.discount.entity.AppliedDiscount;
 import com.sy.backendassignment.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,14 +41,24 @@ public class Order extends BaseEntity {
     @OneToOne(mappedBy = "order", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Payment payment;
 
+    // 적용된 할인 목록
+    @Builder.Default
+    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
+    private List<AppliedDiscount> appliedDiscounts = new ArrayList<>();
+
     // 주문 객체 생성
-    public static Order createOrder(Member member, OrderItem orderItem, BigDecimal paymentAmount) {
+    public static Order createOrder(Member member, OrderItem orderItem, AppliedDiscount appliedDiscount) {
+        // 결제 금액 계산 및 마이너스 값 방지
+        BigDecimal paymentAmount = orderItem.getPrice().subtract(appliedDiscount.getDiscountAmount());
+        paymentAmount = paymentAmount.max(BigDecimal.ZERO).setScale(0, RoundingMode.HALF_UP);
+
         Order order = Order.builder()
                 .cost(orderItem.getPrice())
                 .member(member)
                 .paymentAmount(paymentAmount)
                 .build();
         order.addOrderItem(orderItem);
+        order.addAppliedDiscount(appliedDiscount);
 
         return order;
     }
@@ -55,5 +67,11 @@ public class Order extends BaseEntity {
     public void addOrderItem(OrderItem orderItem) {
         this.orderItems.add(orderItem);
         orderItem.setOrder(this);
+    }
+
+    // 연관관계 편의 메서드
+    public void addAppliedDiscount(AppliedDiscount appliedDiscount) {
+        this.appliedDiscounts.add(appliedDiscount);
+        appliedDiscount.setOrder(this);
     }
 }

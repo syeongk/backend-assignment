@@ -1,10 +1,7 @@
 package com.sy.backendassignment.domain.common;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -33,5 +30,6 @@ public abstract class BaseEntity {
     private LocalDateTime updatedAt;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isDeleted = false;
 }

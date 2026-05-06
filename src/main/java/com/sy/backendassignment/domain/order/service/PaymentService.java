@@ -15,7 +15,6 @@ import static com.sy.backendassignment.domain.order.entity.Payment.createPayment
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
-    private final OrderService orderService;
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
 

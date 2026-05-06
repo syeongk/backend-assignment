@@ -61,12 +61,24 @@ public class DiscountPolicy extends BaseEntity {
     @OneToMany(mappedBy = "discountPolicy", cascade = CascadeType.PERSIST)
     private List<AppliedDiscount> appliedDiscounts = new ArrayList<>();
 
-    // 할인 금액 계산
+    // 할인 총 금액 계산
     public BigDecimal calculateDiscountAmount(BigDecimal price) {
         if (this.discountUnit.equals(WON)) {
             return this.discountValue;
         } else {
             return price.multiply(this.discountValue).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         }
+    }
+
+    public void updateName(String name) {
+        this.name = name;
+    }
+
+    public void updateDiscountValue(BigDecimal discountValue) {
+        this.discountValue = discountValue;
+    }
+
+    public void updateDiscountUnit(DiscountUnit discountUnit) {
+        this.discountUnit = discountUnit;
     }
 }

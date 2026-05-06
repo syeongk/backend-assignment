@@ -5,9 +5,8 @@ import com.sy.backendassignment.domain.discount.entity.DiscountPolicy;
 import com.sy.backendassignment.domain.member.GradeType;
 import com.sy.backendassignment.domain.member.entity.Grade;
 import com.sy.backendassignment.domain.member.entity.Member;
-import com.sy.backendassignment.domain.order.entity.Item;
-import com.sy.backendassignment.domain.order.entity.Order;
 import com.sy.backendassignment.domain.order.repository.OrderRepository;
+import com.sy.backendassignment.domain.order.repository.PaymentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,14 +18,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-
 @ExtendWith(MockitoExtension.class)
-class OrderServiceTest {
+class PaymentServiceTest {
     @InjectMocks
-    private OrderService orderService;
+    private PaymentService paymentService;
+
+    @Mock
+    private PaymentRepository paymentRepository;
 
     @Mock
     private OrderRepository orderRepository;
@@ -93,59 +91,11 @@ class OrderServiceTest {
     }
 
     @Nested
-    @DisplayName("calculatePaymentAmount")
-    class CalculatePaymentAmount {
-
+    @DisplayName("pay")
+    class pay {
         @Test
-        void VIP_등급은_1000원_할인된다() {
-            // given
-            Item item = mock(Item.class);
-            given(item.getPrice()).willReturn(BigDecimal.valueOf(10000));
+        void 결제완료_시_적용된_할인은_DB에_저장한다() {
 
-            // when
-            Order order = orderService.createOrder(vipMember, item);
-
-            // then
-            assertThat(order.getPaymentAmount()).isEqualByComparingTo(BigDecimal.valueOf(9000));
-        }
-
-        @Test
-        void VVIP_등급은_10퍼센트_할인된다() {
-            // given
-            Item item = mock(Item.class);
-            given(item.getPrice()).willReturn(BigDecimal.valueOf(50000));
-
-            // when
-            Order order = orderService.createOrder(vvipMember, item);
-
-            // then
-            assertThat(order.getPaymentAmount()).isEqualByComparingTo(BigDecimal.valueOf(45000));
-        }
-
-        @Test
-        void 일반_등급은_할인되지_않는다() {
-            // given
-            Item item = mock(Item.class);
-            given(item.getPrice()).willReturn(BigDecimal.valueOf(10000));
-
-            // when
-            Order order = orderService.createOrder(normalMember, item);
-
-            // then
-            assertThat(order.getPaymentAmount()).isEqualByComparingTo(BigDecimal.valueOf(10000));
-        }
-
-        @Test
-        void 결제금액이_마이너스가_되지_않아야_한다() {
-            // given
-            Item item = mock(Item.class);
-            given(item.getPrice()).willReturn(BigDecimal.valueOf(500));
-
-            // when
-            Order order = orderService.createOrder(vipMember, item);
-
-            // then
-            assertThat(order.getPaymentAmount()).isEqualByComparingTo(BigDecimal.ZERO);
         }
     }
 }
