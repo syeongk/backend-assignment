@@ -1,4 +1,4 @@
-package com.sy.backendassignment.domain.discount.handler;
+package com.sy.backendassignment.domain.discount.strategy;
 
 import com.sy.backendassignment.domain.discount.DiscountRequest;
 import com.sy.backendassignment.domain.discount.entity.AppliedDiscount;
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import static com.sy.backendassignment.domain.discount.entity.AppliedDiscount.createAppliedDiscount;
 
 @Component
-public class GradeDiscountHandler implements DiscountHandler {
+public class GradeDiscountStrategy implements DiscountStrategy {
     @Override
     public AppliedDiscount applyDiscount(DiscountRequest request) {
         DiscountPolicy discountPolicy = request.member().getDiscountPolicy();

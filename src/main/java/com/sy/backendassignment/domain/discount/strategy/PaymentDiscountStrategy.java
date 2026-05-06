@@ -1,4 +1,4 @@
-package com.sy.backendassignment.domain.discount.handler;
+package com.sy.backendassignment.domain.discount.strategy;
 
 import com.sy.backendassignment.domain.discount.DiscountRequest;
 import com.sy.backendassignment.domain.discount.entity.AppliedDiscount;
@@ -13,7 +13,7 @@ import static com.sy.backendassignment.domain.discount.entity.AppliedDiscount.cr
 
 @Component
 @RequiredArgsConstructor
-public class PaymentDiscountHandler implements DiscountHandler {
+public class PaymentDiscountStrategy implements DiscountStrategy {
     private final DiscountPolicyRepository discountPolicyRepository;
 
     @Override

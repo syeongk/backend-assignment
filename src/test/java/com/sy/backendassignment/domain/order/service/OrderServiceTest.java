@@ -3,8 +3,8 @@ package com.sy.backendassignment.domain.order.service;
 import com.sy.backendassignment.domain.discount.DiscountUnit;
 import com.sy.backendassignment.domain.discount.entity.AppliedDiscount;
 import com.sy.backendassignment.domain.discount.entity.DiscountPolicy;
-import com.sy.backendassignment.domain.discount.handler.GradeDiscountHandler;
-import com.sy.backendassignment.domain.discount.handler.PaymentDiscountHandler;
+import com.sy.backendassignment.domain.discount.strategy.GradeDiscountStrategy;
+import com.sy.backendassignment.domain.discount.strategy.PaymentDiscountStrategy;
 import com.sy.backendassignment.domain.member.GradeType;
 import com.sy.backendassignment.domain.member.entity.Grade;
 import com.sy.backendassignment.domain.member.entity.Member;
@@ -41,10 +41,10 @@ class OrderServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private PaymentDiscountHandler paymentDiscountHandler;
+    private PaymentDiscountStrategy paymentDiscountStrategy;
 
     @Mock
-    private GradeDiscountHandler gradeDiscountHandler;
+    private GradeDiscountStrategy gradeDiscountStrategy;
 
     private Member normalMember;
     private Member vipMember;
@@ -123,7 +123,7 @@ class OrderServiceTest {
                     .name("VIP 등급 할인")
                     .discountAmount(BigDecimal.valueOf(1000))
                     .build();
-            given(gradeDiscountHandler.applyDiscount(any())).willReturn(gradeDiscount);
+            given(gradeDiscountStrategy.applyDiscount(any())).willReturn(gradeDiscount);
 
             // when
             Order order = orderService.createOrder(vipMember, item);
@@ -144,10 +144,10 @@ class OrderServiceTest {
                     .name("VVIP 등급 할인")
                     .discountAmount(BigDecimal.valueOf(5000))
                     .build();
-            given(gradeDiscountHandler.applyDiscount(any())).willReturn(gradeDiscount);
+            given(gradeDiscountStrategy.applyDiscount(any())).willReturn(gradeDiscount);
 
             // when
-            Order order = orderService.createOrder(normalMember, item);
+            Order order = orderService.createOrder(vvipMember, item);
 
             // then
             assertThat(order.getPaymentAmount()).isEqualByComparingTo(BigDecimal.valueOf(45000));
@@ -165,7 +165,7 @@ class OrderServiceTest {
                     .name("NORMAL 등급 할인")
                     .discountAmount(BigDecimal.valueOf(0))
                     .build();
-            given(gradeDiscountHandler.applyDiscount(any())).willReturn(gradeDiscount);
+            given(gradeDiscountStrategy.applyDiscount(any())).willReturn(gradeDiscount);
 
             // when
             Order order = orderService.createOrder(normalMember, item);
@@ -186,13 +186,13 @@ class OrderServiceTest {
                     .name("VIP 등급 할인")
                     .discountAmount(BigDecimal.valueOf(1000))
                     .build();
-            given(gradeDiscountHandler.applyDiscount(any())).willReturn(gradeDiscount);
+            given(gradeDiscountStrategy.applyDiscount(any())).willReturn(gradeDiscount);
 
             AppliedDiscount pointDiscount = AppliedDiscount.builder()
                     .name("포인트 추가 중복 할인")
                     .discountAmount(BigDecimal.valueOf(450))
                     .build();
-            given(paymentDiscountHandler.applyDiscount(any())).willReturn(pointDiscount);
+            given(paymentDiscountStrategy.applyDiscount(any())).willReturn(pointDiscount);
 
             // when : 주문 생성 및 결제 수단 적용
             Order order = orderService.createOrder(vipMember, item);

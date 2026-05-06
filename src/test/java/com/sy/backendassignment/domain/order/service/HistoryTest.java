@@ -116,4 +116,29 @@ class HistoryTest {
         assertThat(history.getName()).isEqualTo("VVIP 등급 할인");
         assertThat(history.getDiscountValue()).isEqualByComparingTo(new BigDecimal("10"));
     }
+
+    @Test
+    void 정책_삭제_후에도_기존_할인이력은_유지되어야_한다() {
+        // given : 주문 생성, VVIP 10% 할인 적용
+        Member member = memberRepository.findById(vvipMember.getId()).orElseThrow();
+        Item item = itemRepository.findById(lectureItem.getId()).orElseThrow();
+
+        Order order = orderService.createOrder(member, item);
+        Long orderId = order.getId();
+        Long policyId = vvipPolicy.getId();
+
+        // when : 정책 삭제 (soft delete)
+        DiscountPolicy policy = discountPolicyRepository.findById(policyId).orElseThrow();
+        policy.delete();
+        discountPolicyRepository.saveAndFlush(policy);
+
+        entityManager.clear();
+
+        // then : 과거 주문 이력 조회 및 검증
+        Order savedOrder = orderRepository.findById(orderId).orElseThrow();
+        AppliedDiscount history = savedOrder.getAppliedDiscounts().get(0);
+
+        assertThat(history.getName()).isEqualTo("VVIP 등급 할인");
+        assertThat(history.getDiscountValue()).isEqualByComparingTo(new BigDecimal("10"));
+    }
 }

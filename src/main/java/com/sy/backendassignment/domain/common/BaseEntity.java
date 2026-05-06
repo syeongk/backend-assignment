@@ -32,4 +32,8 @@ public abstract class BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     private Boolean isDeleted = false;
+
+    public void delete() {
+        this.isDeleted = true;
+    }
 }
