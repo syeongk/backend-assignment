@@ -1,10 +1,10 @@
 package com.sy.backendassignment.domain.order.service;
 
-import com.sy.backendassignment.domain.discount.DiscountPolicyRepository;
 import com.sy.backendassignment.domain.discount.DiscountType;
 import com.sy.backendassignment.domain.discount.DiscountUnit;
 import com.sy.backendassignment.domain.discount.entity.AppliedDiscount;
 import com.sy.backendassignment.domain.discount.entity.DiscountPolicy;
+import com.sy.backendassignment.domain.discount.repository.DiscountPolicyRepository;
 import com.sy.backendassignment.domain.member.GradeType;
 import com.sy.backendassignment.domain.member.entity.Grade;
 import com.sy.backendassignment.domain.member.entity.Member;
@@ -94,14 +94,14 @@ class HistoryTest {
 
     @Test
     void 정책_수정_후에도_기존_할인이력은_유지되어야_한다() {
-        // Given : 주문 생성, VVIP 10% 할인 적용
+        // given : 주문 생성, VVIP 10% 할인 적용
         Member member = memberRepository.findById(vvipMember.getId()).orElseThrow();
         Item item = itemRepository.findById(lectureItem.getId()).orElseThrow();
 
         Order order = orderService.createOrder(member, item);
         Long orderId = order.getId();
 
-        // When : 원본 정책 수정 10% -> 20%
+        // when : 원본 정책 수정 10% -> 20%
         DiscountPolicy policy = discountPolicyRepository.findById(vvipPolicy.getId()).orElseThrow();
         policy.updateName("VVIP 20% 할인");
         policy.updateDiscountValue(new BigDecimal("20"));
@@ -109,7 +109,7 @@ class HistoryTest {
 
         entityManager.clear();
 
-        // Then : 과거 주문 이력 조회 및 검증
+        // then : 과거 주문 이력 조회 및 검증
         Order savedOrder = orderRepository.findById(orderId).orElseThrow();
         AppliedDiscount history = savedOrder.getAppliedDiscounts().get(0);
 

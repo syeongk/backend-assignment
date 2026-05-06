@@ -49,10 +49,10 @@ public class Payment extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    public static Payment createPayment(Member member, Order order, BigDecimal amount, PaymentMethod method) {
+    public static Payment createPayment(Member member, Order order, PaymentMethod method) {
         return Payment.builder()
                 .paymentMethod(method)
-                .amount(amount)
+                .amount(order.getPaymentAmount())
                 .paymentStatus(READY)
                 .order(order)
                 .member(member)

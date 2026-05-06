@@ -1,10 +1,14 @@
 package com.sy.backendassignment.domain.order.service;
 
 import com.sy.backendassignment.domain.discount.DiscountUnit;
+import com.sy.backendassignment.domain.discount.entity.AppliedDiscount;
 import com.sy.backendassignment.domain.discount.entity.DiscountPolicy;
+import com.sy.backendassignment.domain.discount.handler.GradeDiscountHandler;
+import com.sy.backendassignment.domain.discount.handler.PaymentDiscountHandler;
 import com.sy.backendassignment.domain.member.GradeType;
 import com.sy.backendassignment.domain.member.entity.Grade;
 import com.sy.backendassignment.domain.member.entity.Member;
+import com.sy.backendassignment.domain.member.repository.MemberRepository;
 import com.sy.backendassignment.domain.order.entity.Item;
 import com.sy.backendassignment.domain.order.entity.Order;
 import com.sy.backendassignment.domain.order.repository.OrderRepository;
@@ -19,7 +23,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 
+import static com.sy.backendassignment.domain.order.PaymentMethod.POINT;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -30,6 +36,15 @@ class OrderServiceTest {
 
     @Mock
     private OrderRepository orderRepository;
+
+    @Mock
+    private MemberRepository memberRepository;
+
+    @Mock
+    private PaymentDiscountHandler paymentDiscountHandler;
+
+    @Mock
+    private GradeDiscountHandler gradeDiscountHandler;
 
     private Member normalMember;
     private Member vipMember;
@@ -102,6 +117,14 @@ class OrderServiceTest {
             Item item = mock(Item.class);
             given(item.getPrice()).willReturn(BigDecimal.valueOf(10000));
 
+            given(orderRepository.save(any(Order.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+            AppliedDiscount gradeDiscount = AppliedDiscount.builder()
+                    .name("VIP 등급 할인")
+                    .discountAmount(BigDecimal.valueOf(1000))
+                    .build();
+            given(gradeDiscountHandler.applyDiscount(any())).willReturn(gradeDiscount);
+
             // when
             Order order = orderService.createOrder(vipMember, item);
 
@@ -115,8 +138,16 @@ class OrderServiceTest {
             Item item = mock(Item.class);
             given(item.getPrice()).willReturn(BigDecimal.valueOf(50000));
 
+            given(orderRepository.save(any(Order.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+            AppliedDiscount gradeDiscount = AppliedDiscount.builder()
+                    .name("VVIP 등급 할인")
+                    .discountAmount(BigDecimal.valueOf(5000))
+                    .build();
+            given(gradeDiscountHandler.applyDiscount(any())).willReturn(gradeDiscount);
+
             // when
-            Order order = orderService.createOrder(vvipMember, item);
+            Order order = orderService.createOrder(normalMember, item);
 
             // then
             assertThat(order.getPaymentAmount()).isEqualByComparingTo(BigDecimal.valueOf(45000));
@@ -128,6 +159,14 @@ class OrderServiceTest {
             Item item = mock(Item.class);
             given(item.getPrice()).willReturn(BigDecimal.valueOf(10000));
 
+            given(orderRepository.save(any(Order.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+            AppliedDiscount gradeDiscount = AppliedDiscount.builder()
+                    .name("NORMAL 등급 할인")
+                    .discountAmount(BigDecimal.valueOf(0))
+                    .build();
+            given(gradeDiscountHandler.applyDiscount(any())).willReturn(gradeDiscount);
+
             // when
             Order order = orderService.createOrder(normalMember, item);
 
@@ -136,16 +175,32 @@ class OrderServiceTest {
         }
 
         @Test
-        void 결제금액이_마이너스가_되지_않아야_한다() {
+        void 포인트_결제_시_중복할인_된다() {
             // given
             Item item = mock(Item.class);
-            given(item.getPrice()).willReturn(BigDecimal.valueOf(500));
+            given(item.getPrice()).willReturn(BigDecimal.valueOf(10000));
 
-            // when
+            given(orderRepository.save(any(Order.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+            AppliedDiscount gradeDiscount = AppliedDiscount.builder()
+                    .name("VIP 등급 할인")
+                    .discountAmount(BigDecimal.valueOf(1000))
+                    .build();
+            given(gradeDiscountHandler.applyDiscount(any())).willReturn(gradeDiscount);
+
+            AppliedDiscount pointDiscount = AppliedDiscount.builder()
+                    .name("포인트 추가 중복 할인")
+                    .discountAmount(BigDecimal.valueOf(450))
+                    .build();
+            given(paymentDiscountHandler.applyDiscount(any())).willReturn(pointDiscount);
+
+            // when : 주문 생성 및 결제 수단 적용
             Order order = orderService.createOrder(vipMember, item);
+            orderService.applyPaymentMethod(vipMember, order, POINT);
 
             // then
-            assertThat(order.getPaymentAmount()).isEqualByComparingTo(BigDecimal.ZERO);
+            assertThat(order.getPaymentAmount()).isEqualByComparingTo(BigDecimal.valueOf(8550));
         }
     }
 }
+

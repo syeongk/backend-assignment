@@ -46,16 +46,18 @@ public class Order extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private List<AppliedDiscount> appliedDiscounts = new ArrayList<>();
 
+    public static BigDecimal calculatePaymentAmount(BigDecimal originalPrice, AppliedDiscount appliedDiscount) {
+        // 결제 금액 계산 및 마이너스 값 방지
+        BigDecimal paymentAmount = originalPrice.subtract(appliedDiscount.getDiscountAmount());
+        return paymentAmount.max(BigDecimal.ZERO).setScale(0, RoundingMode.HALF_UP);
+    }
+
     // 주문 객체 생성
     public static Order createOrder(Member member, OrderItem orderItem, AppliedDiscount appliedDiscount) {
-        // 결제 금액 계산 및 마이너스 값 방지
-        BigDecimal paymentAmount = orderItem.getPrice().subtract(appliedDiscount.getDiscountAmount());
-        paymentAmount = paymentAmount.max(BigDecimal.ZERO).setScale(0, RoundingMode.HALF_UP);
-
         Order order = Order.builder()
                 .cost(orderItem.getPrice())
                 .member(member)
-                .paymentAmount(paymentAmount)
+                .paymentAmount(calculatePaymentAmount(orderItem.getPrice(), appliedDiscount))
                 .build();
         order.addOrderItem(orderItem);
         order.addAppliedDiscount(appliedDiscount);
@@ -73,5 +75,10 @@ public class Order extends BaseEntity {
     public void addAppliedDiscount(AppliedDiscount appliedDiscount) {
         this.appliedDiscounts.add(appliedDiscount);
         appliedDiscount.setOrder(this);
+    }
+
+    public void applyExtraDiscount(AppliedDiscount appliedDiscount) {
+        this.paymentAmount = calculatePaymentAmount(this.paymentAmount, appliedDiscount);
+        addAppliedDiscount(appliedDiscount);
     }
 }
